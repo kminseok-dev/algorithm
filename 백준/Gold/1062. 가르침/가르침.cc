@@ -1,61 +1,50 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-vector<string> str;
-int max_read_words;
-int n,k;
-bool learned[26];
-int Readable(){
-    int cnt=0;
-    for(string s : str){
-        
-        bool readable = true;
-        for(char c : s){
-            if(!learned[c-'a']){
-                readable = false;
-                break;
+int words[51];
+int learned;
+int n,k,ans;
+
+void dfs(int idx, int remain){
+    if(remain == 0){
+        int cnt = 0;
+        for(int i=0;i<n;i++){
+            if((words[i]&learned)==words[i]){
+                
+                cnt++;
             }
         }
-        if(readable){cnt++;}
-    }
-    return cnt;
-}
-void dfs(int idx, int remain){
-    if(remain==k-5){
-        max_read_words = max(max_read_words,Readable());
+        ans = max(ans,cnt);
         return;
     }
     for(int i=idx;i<26;i++){
-        if(!learned[i]){
-            learned[i]=true;
-            dfs(i+1, remain+1);
-            learned[i]=false;
+        
+        if((learned&(1<<i)) == 0){
+            learned |= 1<<i;
+            dfs(i+1, remain-1);
+            learned &= ~(1<<i);
         }
-    
     }
     
 }
 int main(){
-    
     cin >> n >> k;
-    
     if(k<5){cout<<0;return 0;}
-    for(int i=1;i<=n;i++){
-        string s;
+    string s;
+    for(int i=0;i<n;i++){
+        int num = 0;
         cin >> s;
-        s = s.substr(4,s.length()-8);
-        set<char> unique_chars(s.begin(),s.end());
-        str.push_back(string(unique_chars.begin(),unique_chars.end()));
+        for(int j=0;j<s.length();j++){
+            num |= 1<<(s[j]-'a');
+        }
+        words[i] = num;
     }
-    
-    learned['a'-'a'] = true;
-    learned['n'-'a'] = true;
-    learned['t'-'a'] = true;
-    learned['i'-'a'] = true;
-    learned['c'-'a'] = true;
-    dfs(0, 0);
-    
-    cout<<max_read_words<<'\n';
+    learned |= 1<<('a'-'a');
+    learned |= 1<<('n'-'a');
+    learned |= 1<<('t'-'a');
+    learned |= 1<<('i'-'a');
+    learned |= 1<<('c'-'a');
+    dfs(0,k-5);
+    cout<<ans<<'\n';
     return 0;
-    
 }
