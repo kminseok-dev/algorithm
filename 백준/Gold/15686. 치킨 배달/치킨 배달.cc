@@ -1,65 +1,60 @@
 #include <bits/stdc++.h>
-#define X first
-#define Y second
 
 using namespace std;
-vector<pair<int,int> > chicken;
-vector<pair<int,int> > house;
-vector<pair<int,int> >ChooChi;
-int n,m,result=2e9;
-int arr[51][51];
-int dx[4] = {1,0,-1,0};
-int dy[4] = {0,1,0,-1};
-int Calculator(){
+int city[52][52];
+vector<pair<int,int>>chiLo;
+vector<pair<int,int>>chooCkiLo;
+vector<pair<int,int>>houseLo;
+int n,m;
+int result = 2e9;
+int calculator(){
     int ans = 0;
-    for(int i=0;i<house.size();i++){
-        int dist = 2e9;
-        int x = house[i].X;
-        int y = house[i].Y;
-        //cout<< x<<y<<'\n';
-        for(int j=0;j<ChooChi.size();j++){
-            int chicken_x = ChooChi[j].X;
-            int chicken_y = ChooChi[j].Y;
-            dist = min(dist,abs(x-chicken_x)+abs(y-chicken_y));
+    for(int i=0;i<houseLo.size();i++){
+        int h_c_dist = 2e9;
+        int h_x = houseLo[i].first;
+        int h_y = houseLo[i].second;
+        for(int j=0;j<chooCkiLo.size();j++){
+            int c_x = chooCkiLo[j].first;
+            int c_y = chooCkiLo[j].second;
+            h_c_dist = min(h_c_dist,abs(c_x-h_x)+abs(c_y-h_y));
             
         }
-    ans+=dist;    
-    
-    //cout<<ans<<'\n';
+        ans += h_c_dist;
     }
     return ans;
 }
-void BT(int idx,int k){
-
-    if(k==m){
-        //for(int i=0;i<m;i++)cout<<ChooChi[i].X<<" "<<ChooChi[i].Y<<'\n';
-        result = min(result,Calculator());
+void backTrac(int idx,int cnt){
+    if(cnt==m){
+        result = min(result,calculator());
         return;
     }
-    for(int i=idx;i<chicken.size();i++){
-        ChooChi.push_back(chicken[i]);
-        BT(i+1,k+1);
-        ChooChi.pop_back();
+    for(int i=idx;i<chiLo.size();i++){
+        chooCkiLo.push_back(chiLo[i]);
+        backTrac(i+1,cnt+1);
+        chooCkiLo.pop_back();
     }
+    
 }
-
 int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
-    cin >> n >> m;
+    
+    cin>>n>>m;
     for(int i=1;i<=n;i++){
         for(int j=1;j<=n;j++){
-            cin >> arr[i][j];
-            if(arr[i][j]==2){
-                chicken.push_back({i,j});
+            
+            cin >>city[i][j];
+            if(city[i][j]==2){
+                chiLo.push_back({i,j});
             }
-            else if(arr[i][j]==1){
-                house.push_back({i,j});
+            else if(city[i][j]==1){
+                houseLo.push_back({i,j});
             }
         }
     }
-    BT(0,0);
+    backTrac(0,0);
     cout<<result;
-   
+    return 0;
+
 }
