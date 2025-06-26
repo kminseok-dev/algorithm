@@ -12,15 +12,9 @@ int main(){
     }
     sort(line.begin(),line.end());
    
-    int ans = line[0];
-    for(int i=1;i<n;i++){
-        int result = 0;
-
-        for(int j=0;j<=i;j++){
-            result += line[j];
-        }
-        ans += result;
-       
+    int ans = 0;
+    for(int i=0;i<n;i++){
+        ans += line[i] * (n-i);
     }
     cout<<ans;
 }
