@@ -1,88 +1,41 @@
-// #include <bits/stdc++.h>
-
-// using namespace std;
-// int dp[1001][1001];
-// int main(){
-//     int ans=0;
-//     string s1,s2;
-//     cin>>s1>>s2;
-    
-//     for(int i=1;i<=s1.size();i++){
-//         for(int j=1;j<=s2.size();j++){
-//             if(s1[i-1]==s2[j-1]){
-//                 dp[i][j] = dp[i-1][j-1]+1;
-//             }
-//             else{
-//                 dp[i][j] = max(dp[i-1][j],dp[i][j-1]);
-//             }
-//             ans = max(ans,dp[i][j]);
-//         }
-//     }
-//     cout<<ans;
-// }
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 
 using namespace std;
-int dp[1001][1001];
 
+int dp[1001][1001];
+vector<char> trace;
 int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    int ans=0; 
-    string s1,s2,result;
-    cin>>s1>>s2;
-    
-    for(int i=1;i<=s1.size();i++){
-        for(int j=1;j<=s2.size();j++){
-            if(s1[i-1]==s2[j-1]){
-                dp[i][j] = dp[i-1][j-1]+1;
+    string X ,Y;
+
+    cin >> X >> Y;
+
+    for(int i=1;i<=X.length();i++){
+        for(int j=1;j<=Y.length();j++){
+            if(X[i-1] == Y[j-1]){
+                dp[i][j] = dp[i-1][j-1] + 1;
             }
             else{
                 dp[i][j] = max(dp[i-1][j],dp[i][j-1]);
             }
-            ans = max(ans,dp[i][j]);
         }
     }
-    int dx=s1.size(),dy=s2.size();
-    while(dx!=0&&dy!=0){
-        if(dp[dx][dy]==dp[dx-1][dy]){
-            
-            dx--;
-            
-        }
-        else if(dp[dx][dy]==dp[dx][dy-1]){
-            dy--;
-            
-        }
-        else{
-            result+=s1[dx-1];
-            dx--;dy--;
-        }
-        
-    }
-    // for(int i=1;i<=s1.size();i++){
-    //     for(int j=1;j<=s2.size();j++){
-    //         cout<<dp[i][j]<<' ';
-    //     }
-    //     cout<<'\n';
-    // }
-            
+    int x = X.length();
+    int y = Y.length();
     
-    cout<<ans<<'\n';
-    if(ans!=0){
-        for(int i=result.size()-1;i>=0;i--){
-            cout<<result[i];
+    while(x>0&&y>0){
+        if(dp[x][y] == dp[x-1][y]) x--;
+        else if(dp[x][y] == dp[x][y-1]) y--;
+        else{
+            trace.push_back(X[x-1]);
+            x--;
+            y--;
         }
     }
-    return 0;
+    
+    cout << dp[X.length()][Y.length()] << '\n';
+    for(int i=trace.size()-1;i>=0;i--){
+        cout<<trace[i];
+    }
+   
 }
-// 8 8
-// 7 7
-// 6 6
-// 5 6
-// 4 5
-// 3 4
-// 2 3
-// 2 2
-// 1 1
-// 0 0
