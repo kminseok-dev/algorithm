@@ -7,96 +7,64 @@ using namespace std;
 
 
 struct fireBall{
-    int r,c,m,d,s;
+    int r,c,m,s,d;
 };
 
 int N,M,K;
 
 queue<fireBall> fBox;
-vector<fireBall>world[55][55];
+map<pair<int,int>,vector<fireBall>>world;
 vector<pair<int,int>> dir = {
     {-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1}
 };
 
-queue<pair<int,int>> bfs(queue<fireBall>q){
-    queue<pair<int,int>>pos;
+void moveFb(queue<fireBall>& q){
+    world.clear();
 
     while(!q.empty()){
         auto cur = q.front();
         q.pop();
-        int nr = cur.r;
-        int nc = cur.c;
-        for(int i=1;i<=cur.s;i++){
-            nr += dir[cur.d].X;
-            nc += dir[cur.d].Y;
-            if(nr<1||nc<1||nr>N||nc>N){
-                if(nr<1)nr=N;
-                else if(nr>N)nr = 1;
-                if(nc<1)nc = N;
-                else if(nc>N)nc = 1;
-            }
-        }
-        world[nr][nc].push_back(cur);     
-    }
-    for(int i=1;i<=N;i++){
-        for(int j=1;j<=N;j++){
-            if(world[i][j].size()>=2)pos.push({i,j});
-            else if(world[i][j].size()==1){
-                fireBall fire = world[i][j][0];
-                fire.r = i;
-                fire.c = j;
-                fBox.push(fire);
-            }
-        }
-    }
-    
-    return pos;   
-}
-void seperate(queue<fireBall>q){
-    for(int i=1;i<=N;i++){
-        for(int j=1;j<=N;j++){
-            world[i][j].clear();
-        }
-    }
-    fBox = queue<fireBall>();
-    queue<pair<int,int>> que = bfs(q);
-
-    
-    
-    
-    while(!que.empty()){
-        bool flag;
-        int cnt=0;
-        fireBall sfb = {0,0,0,0,0};
+        int nr = cur.r + cur.s * dir[cur.d].X;
+        int nc = cur.c + cur.s * dir[cur.d].Y;
         
-        auto cur = que.front();
-        sfb.r = cur.X;
-        sfb.c = cur.Y;
-        que.pop();
-        if(world[cur.X][cur.Y][0].d%2==0) flag = true;
-        else flag = false;
+        nr = ((nr-1) % N + N) % N + 1;
+        nc = ((nc-1) % N + N) % N + 1;
 
-        for(int i=0;i<world[cur.X][cur.Y].size();i++){
-            sfb.m += world[cur.X][cur.Y][i].m;
-            sfb.s += world[cur.X][cur.Y][i].s;
-            if(flag){
-                if(world[cur.X][cur.Y][i].d%2!=0)cnt=1;
+        cur.r = nr;
+        cur.c = nc;
+
+        world[{nr,nc}].push_back(cur);     
+    }
+}
+
+void seperateFb(){
+    fBox = queue<fireBall>();
+
+    for(auto& it : world){
+        if(it.Y.size()>=2){
+            fireBall sfb = {it.X.X,it.X.Y,0,0,0};
+            bool flag = true;
+            int parity = it.Y[0].d % 2;
+
+            for(auto& fire : it.Y){
+                sfb.m += fire.m;
+                sfb.s += fire.s;   
+                if(fire.d%2 != parity)flag = false;
             }
-            else{
-                if(world[cur.X][cur.Y][i].d%2==0)cnt=1;
-            }
+            
+            sfb.m /= 5;
+            if(sfb.m == 0)continue;
+            sfb.s /= it.Y.size();
+
+            int startD = flag ? 0 : 1;
+        
+            for(int d=startD;d<=7;d+=2){
+                sfb.d = d;
+                fBox.push(sfb);
+            }    
         }
-        sfb.m /= 5;
-        if(sfb.m == 0)continue;
-        sfb.s /= world[cur.X][cur.Y].size();
-        int dir = 0;
-        if(cnt==1){
-            dir = 1;
-        }
-        for(int i=0;i<4;i++){
-            sfb.d = dir;
-            dir += 2;
-            fBox.push(sfb);
+        else if(it.Y.size()==1){
+            fBox.push(it.Y[0]);
         }
     }
     
@@ -113,10 +81,11 @@ int main(){
         q.push(fb);
     }
     while(K--){
-        seperate(q);
+        moveFb(q);
+        seperateFb();
         q = fBox;
-        
     }
+
     int ans = 0;
     while(!q.empty()){
         auto ball = q.front();
