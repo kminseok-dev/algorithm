@@ -12,8 +12,10 @@ int solution(int bridge_length, int weight, vector<int> truck_weights) {
     q.push(num);
     while(!q.empty()){
         cnt++;
-        if(cnt>bridge_length&&q.front()!=-1)totalWeights-=truck_weights[q.front()];
-        if(cnt>bridge_length)q.pop();
+        if(cnt>bridge_length){
+            if(q.front()!=-1) totalWeights-=truck_weights[q.front()];
+            q.pop();
+        }
         if(num<truck_weights.size()-1){
             if(totalWeights+truck_weights[num+1]<=weight){
                 num++;
