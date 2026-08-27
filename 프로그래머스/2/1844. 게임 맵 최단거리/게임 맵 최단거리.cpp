@@ -1,46 +1,35 @@
-#include <vector>
-#include <queue>
-
+#include <bits/stdc++.h>
 using namespace std;
 
-struct Node
-{
-    int y, x, d;
-};
+int dx[4] = {1, -1, 0, 0};
+int dy[4] = {0, 0, 1, -1};
 
-int solution(vector<vector<int>> maps)
-{
+int solution(vector<vector<int>> maps) {
     int n = maps.size();
     int m = maps[0].size();
 
-    int dy[] = { 0, 1, 0, -1 };
-    int dx[] = { 1, 0, -1, 0 };
+    vector<vector<int>> dist(n, vector<int>(m, 0));  // 지역 변수로 매 호출마다 새로 생성
+    queue<pair<int, int>> q;                          // 지역 변수, vector 대신 pair로 오버헤드도 줄임
 
-    queue<Node> bfs;
-    bool visited[101][101] = {};
-    bfs.push({ 0, 0, 1 });
-    visited[0][0] = true;
+    q.push({0, 0});
+    dist[0][0] = 1;
 
-    while (!bfs.empty())
-    {
-        auto [y, x, d] = bfs.front();
-        bfs.pop();
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
 
-        for (int dir = 0; dir < 4; dir++)
-        {
-            int ny = y + dy[dir];
-            int nx = x + dx[dir];
+        if (x == n - 1 && y == m - 1) return dist[x][y];  // 큐가 빈 뒤가 아니라 여기서 return해도
+                                                             // dist, q가 지역 변수라 다음 호출에 영향 없음
 
-            if (ny < 0 || ny >= n || nx < 0 || nx >= m || visited[ny][nx] || maps[ny][nx] == 0)
-                continue;
-
-            if (ny == n - 1 && nx == m - 1)
-                return d + 1;
-
-            bfs.push({ ny, nx, d + 1 });
-            visited[ny][nx] = true;
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            if (nx < 0 || nx >= n || ny < 0 || ny >= m || dist[nx][ny]) continue;
+            if (maps[nx][ny]) {
+                dist[nx][ny] = dist[x][y] + 1;
+                q.push({nx, ny});
+            }
         }
     }
-
     return -1;
 }
