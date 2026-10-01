@@ -6,14 +6,13 @@ using namespace std;
 
 int solution(int n, vector<vector<int>> edge) {
     int answer = 0;
-    vector<vector<int>> adj(n+4);
-    vector<bool> visited(n+4);
-    vector<int> dist(n+2);
+    vector<vector<int>> adj(n+1);
+    vector<int> dist(n+1,-1);
     
-        for(auto node : edge){
-            adj[node[0]].push_back(node[1]);
-            adj[node[1]].push_back(node[0]);
-        }
+    for(const auto& node : edge){
+        adj[node[0]].push_back(node[1]);
+        adj[node[1]].push_back(node[0]);
+    }
     
     
     queue<int> q;
@@ -21,11 +20,9 @@ int solution(int n, vector<vector<int>> edge) {
     dist[1] = 0;
     while(!q.empty()){
         auto node = q.front(); q.pop();
-        visited[node] = true;
         for(int i=0;i<adj[node].size();i++){
-            if(!visited[adj[node][i]]){
+            if(dist[adj[node][i]]==-1){
                 dist[adj[node][i]] = dist[node] + 1;
-                visited[adj[node][i]] = true;
                 q.push(adj[node][i]);
             }
         }
